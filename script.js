@@ -309,6 +309,7 @@ function chenDongChecklist(sauNode) {
 document.getElementById('btn-them-checklist').addEventListener('mousedown', e => {
   e.preventDefault();
   oGhiChuDien.focus();
+  // Chèn ngay tại dòng checklist đang đứng (nếu có), hoặc cuối cùng nếu không
   const sel = window.getSelection();
   let dongDangDung = null;
   if (sel.rangeCount) {
@@ -319,6 +320,7 @@ document.getElementById('btn-them-checklist').addEventListener('mousedown', e =>
   chenDongChecklist(dongDangDung || oGhiChuDien.lastElementChild);
 });
 
+// Bấm Enter khi đang ở trong 1 dòng checklist -> tự xuống dòng checklist mới (giống Gmail/Keep)
 oGhiChuDien.addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;
   const sel = window.getSelection();
@@ -326,13 +328,14 @@ oGhiChuDien.addEventListener('keydown', e => {
   const node = sel.getRangeAt(0).startContainer;
   const el = node.nodeType === 3 ? node.parentElement : node;
   const dongHienTai = el.closest ? el.closest('.dong-checklist') : null;
-  if (!dongHienTai) return;
+  if (!dongHienTai) return; // không phải checklist, để trình duyệt xử lý bình thường
 
   e.preventDefault();
   const spanHienTai = dongHienTai.querySelector('span');
   const rong = !spanHienTai.textContent.replace(/\u00a0/g, '').trim();
 
   if (rong) {
+    // Enter ở dòng checklist rỗng -> thoát khỏi checklist, tạo dòng thường
     const dongThuong = document.createElement('div');
     dongThuong.innerHTML = '<br>';
     dongHienTai.replaceWith(dongThuong);
@@ -499,3 +502,219 @@ function taoTheDayLeo(m) {
       <button class="nut-thao-tac nut-tuoi" title="Tưới nước">💧</button>
       <button class="nut-thao-tac nut-xem" title="Xem chi tiết / chỉnh sửa">👁</button>
       <button class="nut-thao-tac nut-xoa" title="Xóa">🗑</button>
+    </div>
+  `;
+  div.querySelector('.nut-tuoi').addEventListener('click', () => moModalTuoi(m.id));
+  div.querySelector('.nut-xem').addEventListener('click', () => suaMucTieu(m.id));
+  div.querySelector('.nut-xoa').addEventListener('click', () => xoaMucTieu(m.id));
+  return div;
+}
+
+// ================= TRANG TỔNG QUAN =================
+function renderTongQuan() {
+  const ds = appData.mucTieu;
+  const mam = ds.filter(m => giaiDoan(m.tichLuy / m.chiTieu) === 'mam').length;
+  const truongThanh = ds.filter(m => m.ngayHoanThanh).length;
+
+  datSoDem(document.getElementById('tk-mam'), mam);
+  datSoDem(document.getElementById('tk-truong-thanh'), truongThanh);
+
+  const homNay = new Date(); homNay.setHours(0, 0, 0, 0);
+  let soNgayCoTuoi = 0;
+  for (let i = 0; i < 7; i++) {
+    const ngayXet = homNay.getTime() - i * MOT_NGAY_MS;
+    const coTuoi = appData.nhatKy.some(n => {
+      const d = new Date(n.ngay); d.setHours(0, 0, 0, 0);
+      return d.getTime() === ngayXet;
+    });
+    if (coTuoi) soNgayCoTuoi++;
+  }
+  datSoDem(document.getElementById('tk-tuan'), Math.round(soNgayCoTuoi / 7 * 100), '%');
+
+  renderRung(document.getElementById('canh-rung'), document.getElementById('rung-chu-thich'), ds);
+
+  const dangLon = ds.filter(m => !m.ngayHoanThanh)
+    .sort((a, b) => b.ngayCapNhatCuoi - a.ngayCapNhatCuoi).slice(0, 3);
+  const hopDangLon = document.getElementById('ds-dang-lon');
+  hopDangLon.innerHTML = '';
+  if (dangLon.length === 0) hopDangLon.innerHTML = '<p class="phu-de-nho">Chưa có mục tiêu nào đang thực hiện. Gieo hạt đầu tiên nhé! 🌱</p>';
+  dangLon.forEach(m => hopDangLon.appendChild(taoTheDayLeo(m)));
+
+  datSoDem(document.getElementById('tong-gio-tuoi'), ds.reduce((s, m) => s + m.tichLuy, 0));
+}
+
+function renderRung(canhEl, chuThichEl, dsMucTieu) {
+  canhEl.innerHTML = '';
+  if (dsMucTieu.length === 0) {
+    canhEl.innerHTML = '<p style="align-self:center;color:#5a6b5a;font-size:13px;">🐼 Khu rừng còn trống, hãy gieo hạt đầu tiên!</p>';
+  }
+  dsMucTieu.forEach(m => {
+    const pt = m.tichLuy / m.chiTieu;
+    const div = document.createElement('div');
+    div.className = 'cay-mini';
+    div.innerHTML = `${iconGiaiDoan(giaiDoan(pt))}<span>${m.ten.length > 12 ? m.ten.slice(0, 12) + '…' : m.ten}</span>`;
+    canhEl.appendChild(div);
+  });
+  const soMam = dsMucTieu.filter(m => giaiDoan(m.tichLuy / m.chiTieu) === 'mam').length;
+  const soDangLon = dsMucTieu.filter(m => giaiDoan(m.tichLuy / m.chiTieu) === 'dang-lon').length;
+  const soTruongThanh = dsMucTieu.filter(m => giaiDoan(m.tichLuy / m.chiTieu) === 'truong-thanh').length;
+  chuThichEl.innerHTML = `
+    <span class="the-chu-thich">🌱 ${soMam} Mầm cây</span>
+    <span class="the-chu-thich">🌿 ${soDangLon} Đang lớn</span>
+    <span class="the-chu-thich">🌳 ${soTruongThanh} Trưởng thành</span>
+  `;
+}
+
+// ================= TRANG MỤC TIÊU (tất cả + lọc) =================
+let bocLocHienTai = 'tat-ca';
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    bocLocHienTai = chip.dataset.loc;
+    renderDsTatCa();
+  });
+});
+function renderDsTatCa() {
+  let ds = appData.mucTieu;
+  if (bocLocHienTai === 'dang-lam') ds = ds.filter(m => !m.ngayHoanThanh);
+  if (bocLocHienTai === 'hoan-thanh') ds = ds.filter(m => m.ngayHoanThanh);
+  const hop = document.getElementById('ds-tat-ca');
+  hop.innerHTML = '';
+  if (ds.length === 0) hop.innerHTML = '<p class="phu-de-nho">Không có mục tiêu nào ở mục này.</p>';
+  ds.forEach(m => hop.appendChild(taoTheDayLeo(m)));
+}
+
+// ================= TRANG LỊCH SỬ =================
+function renderLichSu() {
+  const ds = appData.mucTieu.filter(m => m.ngayHoanThanh);
+  const hop = document.getElementById('ds-lich-su');
+  hop.innerHTML = '';
+  if (ds.length === 0) { hop.innerHTML = '<p class="phu-de-nho">Chưa có mục tiêu nào hoàn thành. Cố lên nhé! 💪</p>'; return; }
+  ds.forEach(m => hop.appendChild(taoTheDayLeo(m)));
+}
+
+// ================= THỐNG KÊ (nằm trong trang Tổng quan) =================
+function renderThongKe() {
+  const ds = appData.mucTieu;
+  const tong = ds.length;
+  const hoanThanh = ds.filter(m => m.ngayHoanThanh).length;
+  const trungBinh = tong === 0 ? 0 : ds.reduce((s, m) => s + Math.min(m.tichLuy / m.chiTieu, 1), 0) / tong * 100;
+  document.getElementById('tk-trung-binh').textContent = trungBinh.toFixed(0) + '%';
+
+  const chuVi = 2 * Math.PI * 50;
+  document.getElementById('vong-trung-binh-fill').style.strokeDashoffset = chuVi - (trungBinh / 100) * chuVi;
+
+  const gocHT = tong === 0 ? 0 : (hoanThanh / tong) * 360;
+  document.getElementById('banh-donut').style.background = `conic-gradient(#4c9c56 0deg ${gocHT}deg, #cdd9cd ${gocHT}deg 360deg)`;
+
+  const bieuDo = document.getElementById('bieu-do-tien-trinh');
+  bieuDo.innerHTML = '';
+  if (tong === 0) { bieuDo.innerHTML = '<p class="phu-de-nho">Chưa có dữ liệu.</p>'; return; }
+  ds.forEach(m => {
+    const pt = Math.min(m.tichLuy / m.chiTieu, 1) * 100;
+    const hang = document.createElement('div');
+    hang.className = 'hang-bieu-do';
+    hang.innerHTML = `<div class="dong-nhan"><span>${iconGiaiDoan(giaiDoan(m.tichLuy / m.chiTieu))} ${m.ten}</span><span>${pt.toFixed(0)}%</span></div>
+      <div class="thanh-nen"><div class="thanh-fill" style="width:${pt}%"></div></div>`;
+    bieuDo.appendChild(hang);
+  });
+}
+
+// ================= TRANG NHẬT KÝ =================
+function renderNhatKy() {
+  const hop = document.getElementById('ds-nhat-ky');
+  hop.innerHTML = '';
+  if (appData.nhatKy.length === 0) { hop.innerHTML = '<p class="phu-de-nho">Chưa có lần tưới nước nào được ghi nhận.</p>'; return; }
+  appData.nhatKy.forEach(n => {
+    const div = document.createElement('div');
+    div.className = 'the-day-leo';
+    div.innerHTML = `
+      <div class="avatar-loai" style="background:#e6f6fb;">💧</div>
+      <div class="day-leo-noi">
+        <div class="day-leo-ten">${n.tenMucTieu}</div>
+        <div class="day-leo-loai">${new Date(n.ngay).toLocaleString('vi-VN')}</div>
+      </div>
+      <div class="day-leo-phai"><b>+${n.soGio} giờ</b></div>
+    `;
+    hop.appendChild(div);
+  });
+}
+
+// ================= TRANG CÀI ĐẶT =================
+document.getElementById('btn-luu-ten').addEventListener('click', () => {
+  appData.ten = document.getElementById('ten-nguoi-dung').value.trim();
+  luuDuLieu(appData);
+  capNhatLoiChao();
+  alert('Đã lưu tên!');
+});
+document.getElementById('btn-xoa-het').addEventListener('click', () => {
+  if (!confirm('Chắc chắn xóa TOÀN BỘ dữ liệu? Không thể hoàn tác!')) return;
+  appData = { ten: '', mucTieu: [], nhatKy: [] };
+  luuDuLieu(appData);
+  renderTatCa();
+  alert('Đã xóa toàn bộ dữ liệu.');
+});
+
+// ================= LỊCH TƯỚI NƯỚC (cột phải) =================
+function renderLichTuoi() {
+  const thu = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+  document.getElementById('hang-thu-lich').innerHTML = thu.map(t => `<span>${t}</span>`).join('');
+
+  const homNay = new Date();
+  const thuHomNay = (homNay.getDay() + 6) % 7;
+  const ngayHangDau = new Date(homNay); ngayHangDau.setDate(homNay.getDate() - thuHomNay);
+
+  let htmlNgay = '';
+  let daTuoiHomNay = false;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(ngayHangDau); d.setDate(ngayHangDau.getDate() + i);
+    const laHomNay = d.toDateString() === homNay.toDateString();
+    if (laHomNay) {
+      daTuoiHomNay = appData.nhatKy.some(n => new Date(n.ngay).toDateString() === d.toDateString());
+    }
+    htmlNgay += `<div class="ngay-o ${laHomNay ? 'hom-nay' : ''}">${d.getDate()}</div>`;
+  }
+  document.getElementById('hang-ngay-lich').innerHTML = htmlNgay;
+
+  document.getElementById('the-trang-thai-tuoi').innerHTML = daTuoiHomNay
+    ? '🌱 <div><b>Bạn đã tưới nước hôm nay rồi!</b><br>Giữ vững thói quen tuyệt vời này nhé.</div>'
+    : '💧 <div><b>Hôm nay bạn chưa tưới nước.</b><br>Ghé qua 1 mục tiêu và cập nhật tiến độ nhé!</div>';
+}
+
+// ================= LOGO TÙY CHỈNH =================
+const logoIconNut = document.getElementById('logo-icon-nut');
+const inputLogo = document.getElementById('input-logo');
+logoIconNut.addEventListener('click', () => inputLogo.click());
+inputLogo.addEventListener('change', () => {
+  const file = inputLogo.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    alert('Ảnh hơi nặng, chọn ảnh dưới 2MB nhé để tránh đầy bộ nhớ trình duyệt.');
+    return;
+  }
+  const doc = new FileReader();
+  doc.onload = () => {
+    appData.logoAnh = doc.result;
+    luuDuLieu(appData);
+    hienThiLogo();
+  };
+  doc.readAsDataURL(file);
+});
+function hienThiLogo() {
+  logoIconNut.innerHTML = appData.logoAnh ? `<img src="${appData.logoAnh}" alt="logo">` : '🐼';
+}
+hienThiLogo();
+
+// ================= KHỞI ĐỘNG =================
+function renderTatCa() {
+  capNhatLoiChao();
+  hienThiLogo();
+  renderTongQuan();
+  renderDsTatCa();
+  renderLichSu();
+  renderThongKe();
+  renderNhatKy();
+  renderLichTuoi();
+}
+// Không tự gọi renderTatCa() ở đây — sẽ tự chạy khi Firestore trả dữ liệu về sau khi đăng nhập (xem batDauDongBo).
