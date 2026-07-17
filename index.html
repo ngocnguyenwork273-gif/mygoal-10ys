@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vườn Mục Tiêu 10 Năm 🐼</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="khung-chinh">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="logo-khu">
+      <div class="logo-icon" id="logo-icon-nut" title="Bấm để đổi ảnh logo">🐼</div>
+      <input type="file" id="input-logo" accept="image/*" style="display:none">
+      <p>Vườn Mục Tiêu<br>10 Năm</p>
+    </div>
+    <nav id="menu-chinh">
+      <button class="muc-menu active" data-trang="tong-quan">🏠 Tổng quan</button>
+      <button class="muc-menu" data-trang="muc-tieu">🎯 Mục tiêu</button>
+      <button class="muc-menu" data-trang="nhat-ky">📝 Nhật ký</button>
+      <button class="muc-menu" data-trang="lich-su">🕘 Lịch sử</button>
+      <button class="muc-menu" data-trang="cai-dat">⚙️ Cài đặt</button>
+    </nav>
+  </aside>
+
+  <!-- NỘI DUNG CHÍNH -->
+  <main id="noi-dung">
+
+    <!-- ===== TRANG: TỔNG QUAN ===== -->
+    <section class="trang active" id="trang-tong-quan">
+      <div class="hang-dau-trang">
+        <div class="khoi-la-bay">
+          <span class="la-bay la1">🍃</span><span class="la-bay la2">🍃</span><span class="la-bay la3">🌿</span>
+          <h1 id="loi-chao">Chào bạn <span id="icon-thoi-tiet">☀️</span></h1>
+          <p class="phu-de">Hôm nay bạn đã tưới khu rừng chưa?</p>
+        </div>
+        <button class="btn-chinh" id="btn-mo-form">🌱 Gieo hạt mới</button>
+      </div>
+
+      <div class="hang-thong-ke">
+        <div class="the-tk">
+          <div class="tk-icon mam">🌱</div>
+          <div><span class="tk-so" id="tk-mam">0</span><p>Mầm cây<br><small>Đang phát triển</small></p></div>
+        </div>
+        <div class="the-tk">
+          <div class="tk-icon truong-thanh">🌳</div>
+          <div><span class="tk-so" id="tk-truong-thanh">0</span><p>Cây trưởng thành<br><small>Đã hoàn thành</small></p></div>
+        </div>
+        <div class="the-tk">
+          <div class="tk-icon tuoi">💧</div>
+          <div><span class="tk-so" id="tk-tuan">0%</span><p>Tiến độ tuần này<br><small>Tưới đều mỗi ngày nhé!</small></p></div>
+        </div>
+      </div>
+
+      <div class="khoi-rung kinh">
+        <div class="rung-dau">
+          <div>
+            <h2>Khu rừng của bạn</h2>
+            <p class="phu-de-nho">Mỗi mục tiêu là một cái cây, bạn chính là người làm vườn.</p>
+          </div>
+        </div>
+        <div id="canh-rung" class="canh-rung"></div>
+        <div class="rung-chu-thich" id="rung-chu-thich"></div>
+      </div>
+
+      <div class="khoi-danh-sach kinh">
+        <h2>📊 Thống kê chi tiết</h2>
+        <div class="hang-bieu-do-tron">
+          <div class="khoi-bieu-do">
+            <div class="vong-tron">
+              <svg viewBox="0 0 120 120">
+                <circle class="nen" cx="60" cy="60" r="50"></circle>
+                <circle class="fill" id="vong-trung-binh-fill" cx="60" cy="60" r="50"></circle>
+              </svg>
+              <div class="vong-tron-text"><span id="tk-trung-binh">0%</span><small>Tiến độ TB</small></div>
+            </div>
+            <p class="chu-thich-bieu-do">Tiến độ trung bình</p>
+          </div>
+          <div class="khoi-bieu-do">
+            <div class="banh-donut" id="banh-donut"></div>
+            <p class="chu-thich-bieu-do"><span class="cham xanh"></span>Hoàn thành<span class="cham xam"></span>Đang làm</p>
+          </div>
+        </div>
+        <h3>Tiến trình từng mục tiêu</h3>
+        <div id="bieu-do-tien-trinh"></div>
+      </div>
+
+      <div class="khoi-danh-sach kinh">
+        <h2>Những cái cây đang lớn 🌿</h2>
+        <div id="ds-dang-lon"></div>
+        <button class="btn-phu" id="btn-xem-tat-ca">Xem tất cả mục tiêu ⌄</button>
+      </div>
+
+      <div class="banner-cuoi kinh">
+        <div class="banner-icon">💧</div>
+        <div>
+          <p class="banner-dam">Bạn đã tưới <span id="tong-gio-tuoi">0</span> giờ cho khu rừng của mình</p>
+          <p class="phu-de-nho">Cùng tiếp tục chăm sóc nhé!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TRANG: MỤC TIÊU (tất cả) ===== -->
+    <section class="trang" id="trang-muc-tieu">
+      <div class="hang-dau-trang">
+        <div><h1>🎯 Tất cả mục tiêu</h1><p class="phu-de">Danh sách đầy đủ các mục tiêu bạn đã gieo.</p></div>
+        <button class="btn-chinh" id="btn-mo-form-2">🌱 Gieo hạt mới</button>
+      </div>
+      <div class="loc-hang">
+        <button class="chip active" data-loc="tat-ca">Tất cả</button>
+        <button class="chip" data-loc="dang-lam">Đang thực hiện</button>
+        <button class="chip" data-loc="hoan-thanh">Hoàn thành</button>
+      </div>
+      <div class="khoi-danh-sach kinh">
+        <div id="ds-tat-ca"></div>
+      </div>
+    </section>
+
+    <!-- ===== TRANG: NHẬT KÝ ===== -->
+    <section class="trang" id="trang-nhat-ky">
+      <h1>📝 Nhật ký tưới nước</h1>
+      <p class="phu-de">Lịch sử từng lần bạn ghi nhận tiến độ.</p>
+      <div class="khoi-danh-sach kinh" style="margin-top:16px;">
+        <div id="ds-nhat-ky"></div>
+      </div>
+    </section>
+
+    <!-- ===== TRANG: LỊCH SỬ ===== -->
+    <section class="trang" id="trang-lich-su">
+      <h1>🕘 Lịch sử hoàn thành</h1>
+      <p class="phu-de">Những cây đã trưởng thành trong khu vườn của bạn.</p>
+      <div class="khoi-danh-sach kinh" style="margin-top:16px;">
+        <div id="ds-lich-su"></div>
+      </div>
+    </section>
+
+    <!-- ===== TRANG: CÀI ĐẶT ===== -->
+    <section class="trang" id="trang-cai-dat">
+      <h1>⚙️ Cài đặt</h1>
+      <div class="khoi-danh-sach kinh" style="margin-top:16px;">
+        <h2>Tên của bạn</h2>
+        <input type="text" id="ten-nguoi-dung" placeholder="Ví dụ: Ruby">
+        <button id="btn-luu-ten">Lưu tên</button>
+        <hr style="margin:20px 0;border:none;border-top:1px solid rgba(150,180,150,0.3);">
+        <h2>Vùng nguy hiểm</h2>
+        <p class="phu-de-nho" style="margin-bottom:10px;">Xóa toàn bộ mục tiêu và nhật ký. Không thể hoàn tác.</p>
+        <button class="btn-xoa-tat-ca" id="btn-xoa-het">🗑 Xóa toàn bộ dữ liệu</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- CỘT PHẢI -->
+  <aside id="cot-phai">
+    <div class="kinh khoi-lich">
+      <h3>Lịch tưới nước</h3>
+      <div class="hang-thu" id="hang-thu-lich"></div>
+      <div class="hang-ngay" id="hang-ngay-lich"></div>
+      <div class="the-trang-thai-tuoi" id="the-trang-thai-tuoi"></div>
+    </div>
+
+    <div class="kinh khoi-quote">
+      <p class="quote-icon">🐼</p>
+      <p class="quote-text" id="quote-text">Kiên nhẫn tưới mỗi ngày, cây sẽ lớn vào đúng thời điểm.</p>
+    </div>
+
+    <div class="kinh khoi-panda-noi">
+      <div class="panda-avatar">🐼</div>
+      <div>
+        <p class="banner-dam">Panda nói gì nhỉ?</p>
+        <p class="phu-de-nho" id="panda-tip">Bạn đang làm rất tốt đó! Cố lên nhé 💪</p>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<button id="btn-mo-form-noi" title="Thêm mục tiêu">+</button>
+
+<!-- MODAL THÊM / SỬA MỤC TIÊU -->
+<div id="lop-phu-modal" class="an">
+  <div class="modal kinh">
+    <div class="modal-dau">
+      <h2 id="tieu-de-modal">🌱 Gieo hạt mục tiêu mới</h2>
+      <button class="btn-dong" id="btn-dong-modal">✕</button>
+    </div>
+
+    <h3 class="modal-nhom-tieu-de">🌿 Thông tin cơ bản</h3>
+    <label for="ten-muc-tieu">Tên mục tiêu</label>
+    <input type="text" id="ten-muc-tieu" placeholder="Ví dụ: Chơi guitar thành thạo">
+
+    <label for="loai-muc-tieu">Loại mục tiêu</label>
+    <select id="loai-muc-tieu">
+      <option value="Sự nghiệp & Tài chính">💼 Sự nghiệp & Tài chính</option>
+      <option value="Sức khỏe & Thể chất">💪 Sức khỏe & Thể chất</option>
+      <option value="Phát triển bản thân & Học tập">📚 Phát triển bản thân & Học tập</option>
+      <option value="Ước nguyện của tôi">💫 Ước nguyện của tôi</option>
+    </select>
+
+    <label>Mức độ ưu tiên</label>
+    <div class="chon-uu-tien" id="chon-uu-tien">
+      <button type="button" data-gt="Thấp" class="nut-uu-tien">○ Thấp</button>
+      <button type="button" data-gt="Trung bình" class="nut-uu-tien">○ Trung bình</button>
+      <button type="button" data-gt="Cao" class="nut-uu-tien active">● Cao</button>
+    </div>
+
+    <h3 class="modal-nhom-tieu-de">⏳ Kế hoạch</h3>
+    <div class="hang-2-cot">
+      <div>
+        <label for="chi-tieu-gio">Mục tiêu thời gian tích lũy (giờ)</label>
+        <input type="number" id="chi-tieu-gio" placeholder="Ví dụ: 10000" min="1" step="1" inputmode="numeric">
+      </div>
+      <div>
+        <label for="ngay-du-kien">Ngày dự kiến hoàn thành</label>
+        <input type="date" id="ngay-du-kien">
+      </div>
+    </div>
+    <p class="ghi-chu-nho" id="khoang-thoi-gian-text"></p>
+
+    <h3 class="modal-nhom-tieu-de">📝 Ghi chú (tùy chọn)</h3>
+    <div class="thanh-cong-cu-ghichu">
+      <button type="button" data-lenh="bold" title="In đậm"><b>B</b></button>
+      <button type="button" data-lenh="italic" title="In nghiêng"><i>I</i></button>
+      <button type="button" data-lenh="underline" title="Gạch chân"><u>U</u></button>
+      <button type="button" id="btn-them-checklist" title="Thêm việc cần làm">☑ Việc cần làm</button>
+    </div>
+    <div id="ghi-chu-dien" class="vung-soan-thao" contenteditable="true" data-placeholder="Ghi chú thêm, có thể in đậm, nghiêng hoặc thêm checklist..."></div>
+
+    <div id="khu-phan-chi-danh-cho-sua" class="an">
+      <h3 class="modal-nhom-tieu-de">💧 Lịch sử tưới nước</h3>
+      <div id="khu-lich-su-tuoi"></div>
+
+      <h3 class="modal-nhom-tieu-de">🕘 Lịch sử chỉnh sửa</h3>
+      <div id="khu-lich-su-sua"></div>
+    </div>
+
+    <button id="btn-them-muc-tieu">🐼 Gieo hạt</button>
+  </div>
+</div>
+
+<!-- MODAL TƯỚI NƯỚC -->
+<div id="lop-phu-tuoi" class="an">
+  <div class="modal kinh modal-nho modal-tuoi">
+    <div class="modal-tuoi-dau">
+      <span class="giot-lon">💧</span>
+      <button class="btn-dong btn-dong-tuoi" id="btn-dong-modal-tuoi">✕</button>
+    </div>
+    <h2 class="modal-tuoi-tieu-de">Tưới nước cho cây</h2>
+    <p class="phu-de-nho" id="ten-muc-tieu-dang-tuoi" style="margin-bottom:14px;text-align:center;"></p>
+
+    <label for="ngay-tuoi">Ngày thực hiện</label>
+    <input type="date" id="ngay-tuoi">
+
+    <label for="so-gio-tuoi">Số giờ vừa thực hiện</label>
+    <input type="text" id="so-gio-tuoi" placeholder='Ví dụ: 2  hoặc  2+2+2'>
+
+    <button id="btn-xac-nhan-tuoi">💧 Tưới nước</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
