@@ -8,6 +8,26 @@
 </head>
 <body>
 
+<!-- Firebase SDK (bản compat, dễ dùng cho người mới, không cần build tool) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+
+<!-- MÀN HÌNH ĐĂNG NHẬP -->
+<div id="man-hinh-dang-nhap">
+  <div class="kinh khung-dang-nhap">
+    <div class="mascot" style="margin:0 auto 14px;">🐼</div>
+    <h2 style="text-align:center;color:var(--xanh-dam);">Đăng nhập</h2>
+    <p class="phu-de-nho" style="text-align:center;margin-bottom:16px;">Vườn Mục Tiêu 10 Năm</p>
+    <label for="dn-email">Email</label>
+    <input type="email" id="dn-email" placeholder="ban@email.com">
+    <label for="dn-mat-khau">Mật khẩu</label>
+    <input type="password" id="dn-mat-khau" placeholder="••••••••">
+    <p id="dn-loi" class="dn-loi"></p>
+    <button id="btn-dang-nhap">Đăng nhập</button>
+  </div>
+</div>
+
 <div id="khung-chinh">
 
   <!-- SIDEBAR -->
@@ -148,6 +168,10 @@
         <h2>Vùng nguy hiểm</h2>
         <p class="phu-de-nho" style="margin-bottom:10px;">Xóa toàn bộ mục tiêu và nhật ký. Không thể hoàn tác.</p>
         <button class="btn-xoa-tat-ca" id="btn-xoa-het">🗑 Xóa toàn bộ dữ liệu</button>
+        <hr style="margin:20px 0;border:none;border-top:1px solid rgba(150,180,150,0.3);">
+        <h2>Tài khoản</h2>
+        <p class="phu-de-nho" id="dang-nhap-la" style="margin-bottom:10px;"></p>
+        <button id="btn-dang-xuat">🚪 Đăng xuất</button>
       </div>
     </section>
 
