@@ -271,9 +271,43 @@ label { display: block; font-size: 12.5px; margin-top: 8px; margin-bottom: 4px; 
 }
 @media (max-width: 760px) {
   #khung-chinh { grid-template-columns: 1fr; }
-  #sidebar { display: none; }
-  #btn-mo-form-noi { display: block; }
   .hang-2-cot { grid-template-columns: 1fr; }
+
+  /* Sidebar không ẩn hẳn nữa — thu gọn thành top-bar chỉ còn logo + tên app,
+     phần menu điều hướng chuyển xuống thanh dưới cùng (#menu-mobile). */
+  #sidebar {
+    display: flex; align-items: center; min-height: auto; height: auto;
+    padding: 12px 16px; border-right: none; border-bottom: 1px solid rgba(150,180,150,0.15);
+    z-index: 140;
+  }
+  #sidebar .logo-khu { margin-bottom: 0; text-align: left; display: flex; align-items: center; gap: 10px; }
+  #sidebar .logo-icon { width: 40px; height: 40px; font-size: 20px; margin: 0; }
+  #menu-chinh { display: none; }
+
+  #noi-dung { padding: 16px 14px 90px; }
+  .the-tk { min-width: 100%; }
+  .modal { padding: 16px; }
+
+  #btn-mo-form-noi { display: block; bottom: 84px; }
+}
+
+/* ===== Thanh điều hướng dưới cùng (mobile) ===== */
+#menu-mobile { display: none; }
+@media (max-width: 760px) {
+  #menu-mobile {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 150;
+    background: #fff; border-top: 1px solid rgba(150,180,150,0.2);
+    box-shadow: 0 -4px 16px rgba(80,120,90,0.08);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+  #menu-mobile .muc-menu {
+    all: unset; box-sizing: border-box; cursor: pointer; flex: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 6px 2px; border-radius: 10px; text-align: center;
+    color: #8a998a; font-size: 10px; font-weight: 700;
+  }
+  #menu-mobile .muc-menu .mm-icon { font-size: 19px; line-height: 1; }
+  #menu-mobile .muc-menu.active { color: var(--xanh); }
 }
 
 /* ===================== BỔ SUNG MỚI ===================== */

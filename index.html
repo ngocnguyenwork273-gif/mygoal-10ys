@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vườn Mục Tiêu 10 Năm 🐼</title>
 <link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:,">
 </head>
 <body>
 
@@ -200,6 +201,15 @@
 
 </div>
 
+<!-- THANH ĐIỀU HƯỚNG DƯỚI CÙNG (chỉ hiện trên mobile) -->
+<nav id="menu-mobile">
+  <button class="muc-menu active" data-trang="tong-quan"><span class="mm-icon">🏠</span><span class="mm-nhan">Tổng quan</span></button>
+  <button class="muc-menu" data-trang="muc-tieu"><span class="mm-icon">🎯</span><span class="mm-nhan">Mục tiêu</span></button>
+  <button class="muc-menu" data-trang="nhat-ky"><span class="mm-icon">📝</span><span class="mm-nhan">Nhật ký</span></button>
+  <button class="muc-menu" data-trang="lich-su"><span class="mm-icon">🕘</span><span class="mm-nhan">Lịch sử</span></button>
+  <button class="muc-menu" data-trang="cai-dat"><span class="mm-icon">⚙️</span><span class="mm-nhan">Cài đặt</span></button>
+</nav>
+
 <button id="btn-mo-form-noi" title="Thêm mục tiêu">+</button>
 
 <!-- MODAL THÊM / SỬA MỤC TIÊU -->
@@ -233,7 +243,7 @@
     <div class="hang-2-cot">
       <div>
         <label for="chi-tieu-gio">Mục tiêu thời gian tích lũy (giờ)</label>
-        <input type="number" id="chi-tieu-gio" placeholder="Ví dụ: 10000" min="1" step="1" inputmode="numeric">
+        <input type="text" id="chi-tieu-gio" placeholder="Ví dụ: 10.000" inputmode="numeric">
       </div>
       <div>
         <label for="ngay-du-kien">Ngày dự kiến hoàn thành</label>
