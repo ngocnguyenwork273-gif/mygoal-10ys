@@ -4,8 +4,8 @@ const SO_NGAY_CANH_BAO = 7;
 // ================= SUPABASE =================
 // Lấy 2 giá trị này trong Supabase Dashboard > Project Settings > API
 // (Project URL và anon/public key — 2 giá trị này public được, không phải bí mật).
-const SUPABASE_URL = 'DIEN_SUPABASE_URL_VAO_DAY';
-const SUPABASE_ANON_KEY = 'DIEN_SUPABASE_ANON_KEY_VAO_DAY';
+const SUPABASE_URL = 'https://qntngmwapffgytxzcftc.supabase.co/rest/v1/';
+const SUPABASE_ANON_KEY = 'sb_publishable_oywktbf_rgbw5tGUQwGBWQ_H6gqcOkw';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let appData = { ten: '', mucTieu: [], nhatKy: [] };
