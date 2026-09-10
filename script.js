@@ -1,51 +1,59 @@
 const MOT_NGAY_MS = 24 * 60 * 60 * 1000;
 const SO_NGAY_CANH_BAO = 7;
 
-// ================= FIREBASE =================
-const firebaseConfig = {
-  apiKey: "AIzaSyA7X8J8LjHVIL0Pni36_YYo5-TrFIbn86E",
-  authDomain: "my-goal-10s.firebaseapp.com",
-  projectId: "my-goal-10s",
-  storageBucket: "my-goal-10s.firebasestorage.app",
-  messagingSenderId: "911449251066",
-  appId: "1:911449251066:web:577f8e4cb87ee74092bd43",
-  measurementId: "G-XPGRNXJFG1"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+// ================= SUPABASE =================
+// Lấy 2 giá trị này trong Supabase Dashboard > Project Settings > API
+// (Project URL và anon/public key — 2 giá trị này public được, không phải bí mật).
+const SUPABASE_URL = 'DIEN_SUPABASE_URL_VAO_DAY';
+const SUPABASE_ANON_KEY = 'DIEN_SUPABASE_ANON_KEY_VAO_DAY';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let appData = { ten: '', mucTieu: [], nhatKy: [] };
 let dangTaiLanDau = true;
-let huyLangNgheFirestore = null;
+let kenhRealtime = null;
 
-// ===== Lưu dữ liệu lên Firestore (thay cho localStorage.setItem) =====
-function luuDuLieu(data) {
-  const user = auth.currentUser;
+// ===== Lưu dữ liệu lên bảng app_data (thay cho localStorage.setItem) =====
+async function luuDuLieu(data) {
+  const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) return;
-  db.collection('nguoiDung').doc(user.uid).set(data).catch(err => {
-    console.error('Lỗi khi lưu dữ liệu:', err);
-  });
+  const { error } = await supabaseClient
+    .from('app_data')
+    .upsert({ user_id: user.id, data, updated_at: new Date().toISOString() });
+  if (error) console.error('Lỗi khi lưu dữ liệu:', error);
 }
 
-// ===== Bắt đầu lắng nghe dữ liệu theo thời gian thực (thay cho taiDuLieu) =====
-function batDauDongBo(user) {
-  if (huyLangNgheFirestore) huyLangNgheFirestore();
+// ===== Tải dữ liệu lần đầu + lắng nghe thay đổi theo thời gian thực (thay cho onSnapshot) =====
+async function batDauDongBo(user) {
+  if (kenhRealtime) { supabaseClient.removeChannel(kenhRealtime); kenhRealtime = null; }
   dangTaiLanDau = true;
-  huyLangNgheFirestore = db.collection('nguoiDung').doc(user.uid)
-    .onSnapshot(doc => {
-      if (doc.exists) {
-        appData = doc.data();
+
+  const { data: hang, error } = await supabaseClient
+    .from('app_data')
+    .select('data')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  if (error) console.error('Lỗi tải dữ liệu:', error);
+
+  appData = (hang && hang.data) ? hang.data : { ten: '', mucTieu: [], nhatKy: [] };
+  if (!appData.mucTieu) appData.mucTieu = [];
+  if (!appData.nhatKy) appData.nhatKy = [];
+  renderTatCa();
+  dangTaiLanDau = false;
+
+  // Lắng nghe realtime: khi dữ liệu của user này đổi (vd sửa từ máy/thiết bị khác)
+  kenhRealtime = supabaseClient
+    .channel('app_data_' + user.id)
+    .on('postgres_changes', {
+      event: '*', schema: 'public', table: 'app_data', filter: `user_id=eq.${user.id}`
+    }, (payload) => {
+      if (payload.new && payload.new.data) {
+        appData = payload.new.data;
         if (!appData.mucTieu) appData.mucTieu = [];
         if (!appData.nhatKy) appData.nhatKy = [];
-      } else {
-        appData = { ten: '', mucTieu: [], nhatKy: [] };
+        renderTatCa();
       }
-      renderTatCa();
-      dangTaiLanDau = false;
-    }, err => {
-      console.error('Lỗi đồng bộ dữ liệu:', err);
-    });
+    })
+    .subscribe();
 }
 
 // ===== Xử lý đăng nhập / đăng xuất =====
@@ -54,25 +62,25 @@ const oDnEmail = document.getElementById('dn-email');
 const oDnMatKhau = document.getElementById('dn-mat-khau');
 const dnLoi = document.getElementById('dn-loi');
 
-document.getElementById('btn-dang-nhap').addEventListener('click', () => {
+document.getElementById('btn-dang-nhap').addEventListener('click', async () => {
   dnLoi.textContent = '';
   const email = oDnEmail.value.trim();
   const matKhau = oDnMatKhau.value;
   if (!email || !matKhau) { dnLoi.textContent = 'Nhập đủ email và mật khẩu nhé!'; return; }
-  auth.signInWithEmailAndPassword(email, matKhau).catch(err => {
-    dnLoi.textContent = 'Sai email hoặc mật khẩu, thử lại nhé!';
-  });
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password: matKhau });
+  if (error) dnLoi.textContent = 'Sai email hoặc mật khẩu, thử lại nhé!';
 });
 oDnMatKhau.addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('btn-dang-nhap').click();
 });
 
-document.getElementById('btn-dang-xuat').addEventListener('click', () => {
+document.getElementById('btn-dang-xuat').addEventListener('click', async () => {
   if (!confirm('Đăng xuất khỏi app?')) return;
-  auth.signOut();
+  await supabaseClient.auth.signOut();
 });
 
-auth.onAuthStateChanged(user => {
+supabaseClient.auth.onAuthStateChange((_event, session) => {
+  const user = session ? session.user : null;
   if (user) {
     document.body.classList.remove('chua-dang-nhap');
     manHinhDangNhap.classList.add('an');
@@ -81,7 +89,7 @@ auth.onAuthStateChanged(user => {
   } else {
     document.body.classList.add('chua-dang-nhap');
     manHinhDangNhap.classList.remove('an');
-    if (huyLangNgheFirestore) { huyLangNgheFirestore(); huyLangNgheFirestore = null; }
+    if (kenhRealtime) { supabaseClient.removeChannel(kenhRealtime); kenhRealtime = null; }
     oDnEmail.value = '';
     oDnMatKhau.value = '';
   }
